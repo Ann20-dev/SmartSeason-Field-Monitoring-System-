@@ -192,7 +192,39 @@ npm run build
 ## Deployment
 
 - Live deployment link: not included
-- The project is ready to be deployed as two services or adapted into a single hosted monorepo workflow
+- The project is ready to be deployed as two services from the same repository
+
+### Recommended Deployment Setup
+
+- Frontend: Render Static Site or Vercel
+- Backend: Render Web Service
+- Current repository support: `render.yaml` is included for an easier Render deployment flow
+
+### Render Deployment Steps
+
+1. Push the repository to GitHub.
+2. In Render, create a new Blueprint and connect this repository.
+3. Render will detect [render.yaml](</c:/Users/Anastacia/OneDrive/Desktop/SmartSeason Field Monitoring System/render.yaml>) and create:
+   - `smartseason-api`
+   - `smartseason-client`
+4. After Render generates the frontend URL, set:
+   - `CLIENT_URL` on the backend to your frontend URL
+   - `VITE_API_URL` on the frontend to `https://your-backend-url/api`
+5. Redeploy both services after setting those environment variables.
+
+### Vercel + Render Alternative
+
+- Deploy the `client/` folder to Vercel as a Vite app
+- Deploy the `server/` folder to Render as a Node web service
+- Set:
+  - `VITE_API_URL` in Vercel to your Render backend URL plus `/api`
+  - `CLIENT_URL` in Render to your Vercel frontend URL
+
+### Hosted Data Note
+
+- Render web services use an ephemeral filesystem by default, so the current SQLite file in `server/data/` should be treated as demo-only in hosted environments.
+- In practice, this means seeded/demo data may reset after redeploys or restarts unless you move to a managed database or add persistent storage.
+- For this assessment, the local SQLite approach keeps setup simple, but a production deployment should move persistence to Postgres, MySQL, or a persistent disk-backed solution.
 
 ## Possible Next Improvements
 
