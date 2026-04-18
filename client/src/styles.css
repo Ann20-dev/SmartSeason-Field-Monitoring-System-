@@ -180,6 +180,10 @@ textarea:focus {
   margin-top: 12px;
 }
 
+.add-field-button {
+  margin-bottom: 16px;
+}
+
 .error-text {
   color: #a64220;
   margin: 0;
@@ -360,6 +364,17 @@ textarea:focus {
   gap: 8px;
 }
 
+.empty-state {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.64);
+  border: 1px dashed rgba(33, 77, 47, 0.18);
+}
+
+.empty-state strong {
+  color: #214d2f;
+}
+
 .compact-form textarea {
   resize: vertical;
 }
@@ -392,4 +407,3 @@ textarea:focus {
     flex-direction: column;
   }
 }
-

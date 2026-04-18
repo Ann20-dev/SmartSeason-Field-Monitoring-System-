@@ -237,6 +237,7 @@ function UpdateForm({ field, onSave, loading }) {
 function Dashboard({ user, summary, fields, agents, onCreateField, onEditField, onAddUpdate, onLogout, loading }) {
   const [selectedField, setSelectedField] = useState(fields[0] || null);
   const [editingField, setEditingField] = useState(null);
+  const [isCreatingField, setIsCreatingField] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -258,6 +259,7 @@ function Dashboard({ user, summary, fields, agents, onCreateField, onEditField, 
         await onCreateField(payload);
       }
       setEditingField(null);
+      setIsCreatingField(false);
     } catch (err) {
       setError(err.message);
     }
@@ -272,6 +274,27 @@ function Dashboard({ user, summary, fields, agents, onCreateField, onEditField, 
       setError(err.message);
     }
   };
+
+  const startCreateField = () => {
+    setError("");
+    setEditingField(null);
+    setIsCreatingField(true);
+  };
+
+  const startEditField = () => {
+    if (!selectedField) return;
+    setError("");
+    setIsCreatingField(false);
+    setEditingField(selectedField);
+  };
+
+  const closeFieldForm = () => {
+    setError("");
+    setEditingField(null);
+    setIsCreatingField(false);
+  };
+
+  const isManagingField = isCreatingField || Boolean(editingField);
 
   return (
     <div className="app-shell">
@@ -339,6 +362,12 @@ function Dashboard({ user, summary, fields, agents, onCreateField, onEditField, 
             </p>
           </div>
 
+          {user.role === "admin" ? (
+            <button className="primary-button full-width add-field-button" onClick={startCreateField} type="button">
+              Add New Field
+            </button>
+          ) : null}
+
           <div className="field-list">
             {fields.map((field) => (
               <button
@@ -367,10 +396,18 @@ function Dashboard({ user, summary, fields, agents, onCreateField, onEditField, 
 
         <div className="panel">
           <div className="panel-heading">
-            <h2>{user.role === "admin" ? (editingField ? "Edit Field" : "Create Field") : "Submit Field Update"}</h2>
+            <h2>
+              {user.role === "admin"
+                ? editingField
+                  ? "Edit Field"
+                  : "Create Field"
+                : "Submit Field Update"}
+            </h2>
             <p>
               {user.role === "admin"
-                ? "Manage the core field record and assignments."
+                ? isManagingField
+                  ? "Manage the core field record and assignments."
+                  : "Use the add button to create a new field or choose one to edit."
                 : selectedField
                   ? `Reporting for ${selectedField.name}.`
                   : "Select a field to begin."}
@@ -381,19 +418,24 @@ function Dashboard({ user, summary, fields, agents, onCreateField, onEditField, 
 
           {user.role === "admin" ? (
             <>
-              <FieldForm
-                agents={agents}
-                editingField={editingField}
-                loading={loading}
-                onCancel={() => setEditingField(null)}
-                onSave={saveField}
-              />
+              {isManagingField ? (
+                <FieldForm
+                  agents={agents}
+                  editingField={editingField}
+                  loading={loading}
+                  onCancel={closeFieldForm}
+                  onSave={saveField}
+                />
+              ) : (
+                <div className="empty-state">
+                  <p className="muted-text">
+                    No form is open. Click <strong>Add New Field</strong> to register another field, or edit the
+                    selected field below.
+                  </p>
+                </div>
+              )}
               {selectedField ? (
-                <button
-                  className="ghost-button full-width"
-                  onClick={() => setEditingField(selectedField)}
-                  type="button"
-                >
+                <button className="ghost-button full-width" onClick={startEditField} type="button">
                   Edit Selected Field
                 </button>
               ) : null}
