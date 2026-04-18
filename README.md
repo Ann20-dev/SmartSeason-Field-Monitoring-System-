@@ -2,6 +2,14 @@
 
 SmartSeason is a simple full-stack field operations app for tracking crop progress across multiple fields during a growing season. It includes role-based access for admins and field agents, field assignment workflows, stage updates, and a dashboard with operational summaries.
 
+## Reviewer Summary
+
+- Clean monorepo with separate frontend and backend workspaces
+- Role-based access for `Admin` and `Field Agent`
+- Core workflows implemented: authentication, field management, assignment, stage updates, notes, dashboards
+- Seeded demo data for immediate testing
+- Simple backend-computed status logic: `Active`, `At Risk`, `Completed`
+
 ## Stack
 
 - Backend: Node.js, Express, SQLite via `sql.js`
@@ -19,6 +27,18 @@ SmartSeason is a simple full-stack field operations app for tracking crop progre
 - Agent dashboard with assigned fields only
 - Computed field status: `Active`, `At Risk`, `Completed`
 
+## Architecture
+
+```text
+React client (Vite)
+  -> REST API calls with JWT
+Express API
+  -> Auth middleware
+  -> Role-based route protection
+  -> Field and dashboard business logic
+SQLite database (persisted locally via sql.js)
+```
+
 ## Status Logic
 
 Each field status is computed on the backend:
@@ -28,6 +48,23 @@ Each field status is computed on the backend:
 - `Active`: any field that is not completed and does not meet the risk conditions
 
 This gives admins a quick operational view while still keeping the logic easy to explain and extend.
+
+## Core Workflows
+
+### Admin
+
+- Log in and view an overview of all fields
+- Create a new field with crop type, planting date, stage, and assigned agent
+- Edit an existing field
+- Monitor status counts and stage breakdowns
+- Review the latest notes and progress for each field
+
+### Field Agent
+
+- Log in and view only assigned fields
+- Update the current stage of a field
+- Add observations or notes from the field
+- See latest status and field-level details
 
 ## Design Decisions
 
@@ -87,6 +124,15 @@ The UI will run on `http://localhost:5173`.
 npm run build
 ```
 
+## Quick Demo Flow
+
+1. Sign in as Admin.
+2. Review the dashboard totals and status breakdown.
+3. Create a new field and assign it to an agent.
+4. Sign out and sign in as `agent1@smartseason.local`.
+5. Open an assigned field and submit a stage update with notes.
+6. Sign back in as Admin to see the updated field state reflected in the overview.
+
 ## Demo Credentials
 
 - Admin
@@ -111,6 +157,23 @@ npm run build
 - `POST /api/fields/:id/updates`
 - `GET /api/users/agents`
 
+## Sample Field Object
+
+```json
+{
+  "id": 1,
+  "name": "North Plot",
+  "cropType": "Maize",
+  "plantingDate": "2026-03-10",
+  "currentStage": "Growing",
+  "assignedAgentId": 2,
+  "assignedAgentName": "Daniel Field Agent",
+  "latestNotes": "Plants are healthy and irrigation is consistent.",
+  "lastUpdateAt": "2026-04-15 09:00:00",
+  "status": "Active"
+}
+```
+
 ## Trade-Offs
 
 - I kept the architecture intentionally compact to optimize for readability and reviewability over framework complexity.
@@ -122,6 +185,14 @@ npm run build
 
 - Live deployment link: not included
 - The project is ready to be deployed as two services or adapted into a single hosted monorepo workflow
+
+## Possible Next Improvements
+
+- Add registration and user management screens
+- Add richer field history and timeline views
+- Support image attachments for field observations
+- Replace hardcoded JWT secret handling with environment-based secrets
+- Add automated API and UI tests
 
 ## Notes
 
