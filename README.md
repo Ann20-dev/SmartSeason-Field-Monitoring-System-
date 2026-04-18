@@ -118,6 +118,14 @@ npm run dev:client
 
 The UI will run on `http://localhost:5173`.
 
+### Alternative: start both services with one command
+
+```bash
+npm run dev
+```
+
+This starts both the backend and frontend together from the project root.
+
 ### 4. Build the frontend for production
 
 ```bash
